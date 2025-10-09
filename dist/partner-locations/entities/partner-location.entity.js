@@ -11,12 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartnerLocationSchema = exports.PartnerLocation = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-class PartnerLocation {
+let PartnerLocation = class PartnerLocation {
     deliveryPartnerId;
     cityName;
     state;
     pincode;
-}
+};
 exports.PartnerLocation = PartnerLocation;
 __decorate([
     (0, mongoose_1.Prop)(),
@@ -34,5 +34,8 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], PartnerLocation.prototype, "pincode", void 0);
+exports.PartnerLocation = PartnerLocation = __decorate([
+    (0, mongoose_1.Schema)({ timestamps: true, collection: "partner_locations" })
+], PartnerLocation);
 exports.PartnerLocationSchema = mongoose_1.SchemaFactory.createForClass(PartnerLocation);
 //# sourceMappingURL=partner-location.entity.js.map

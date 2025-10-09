@@ -5,7 +5,11 @@ export declare class DeliveryPartnersController {
     private readonly deliveryPartnersService;
     constructor(deliveryPartnersService: DeliveryPartnersService);
     create(createDeliveryPartnerDto: CreateDeliveryPartnerDto): string;
-    findAll(): string;
+    findAll(): Promise<(import("mongoose").Document<unknown, {}, import("./entities/delivery-partner.entity").DeliveryPartner, {}, {}> & import("./entities/delivery-partner.entity").DeliveryPartner & {
+        _id: import("mongoose").Types.ObjectId;
+    } & {
+        __v: number;
+    })[]>;
     findOne(id: string): string;
     update(id: string, updateDeliveryPartnerDto: UpdateDeliveryPartnerDto): string;
     remove(id: string): string;

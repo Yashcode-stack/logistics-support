@@ -19,11 +19,26 @@ const partner_location_entity_1 = require("./entities/partner-location.entity");
 const mongoose_2 = require("@nestjs/mongoose");
 let PartnerLocationsService = class PartnerLocationsService {
     partnerLocationModel;
+    create(createPartnerLocationDto) {
+        throw new Error('Method not implemented.');
+    }
+    remove(arg0) {
+        throw new Error('Method not implemented.');
+    }
+    update(arg0, updatePartnerLocationDto) {
+        throw new Error('Method not implemented.');
+    }
+    findOne(arg0) {
+        throw new Error('Method not implemented.');
+    }
+    findAll() {
+        throw new Error('Method not implemented.');
+    }
     constructor(partnerLocationModel) {
         this.partnerLocationModel = partnerLocationModel;
     }
-    getAll(query, projection, page, limit) {
-        return this.partnerLocationModel
+    async getAll(query, projection, page, limit) {
+        return await this.partnerLocationModel
             .find(query, projection)
             .skip((page - 1) * limit)
             .limit(limit);

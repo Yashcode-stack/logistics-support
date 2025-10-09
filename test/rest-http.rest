@@ -1,0 +1,10 @@
+POST http://localhost:3000/serviceability/check
+Content-Type: application/json
+
+{
+    "origin" : 110064,
+    "destination" : 110065
+}
+
+###Test
+GET  http://localhost:3000

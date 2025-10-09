@@ -20,8 +20,8 @@ let ServiceabilityController = class ServiceabilityController {
     constructor(serviceabilityService) {
         this.serviceabilityService = serviceabilityService;
     }
-    checkServiceability(body) {
-        return body;
+    async checkServiceability(body) {
+        return await this.serviceabilityService.checkServiceability(body);
     }
 };
 exports.ServiceabilityController = ServiceabilityController;
@@ -30,7 +30,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ServiceabilityController.prototype, "checkServiceability", null);
 exports.ServiceabilityController = ServiceabilityController = __decorate([
     (0, common_1.Controller)('serviceability'),

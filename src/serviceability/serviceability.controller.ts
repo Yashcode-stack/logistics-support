@@ -6,7 +6,7 @@ export class ServiceabilityController {
   constructor(private readonly serviceabilityService: ServiceabilityService) {}
 
   @Post('/check')
-  checkServiceability(@Body() body: any) {
-    return body;
+  async checkServiceability(@Body() body: any) {
+    return await this.serviceabilityService.checkServiceability(body);
   }
 }

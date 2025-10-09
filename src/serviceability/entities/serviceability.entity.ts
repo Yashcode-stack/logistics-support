@@ -17,7 +17,7 @@ export class Serviceability {
   @Prop()
   reversePickup: boolean;
 
-  @Prop()
+  @Prop() 
   pickup: boolean;
 }
 

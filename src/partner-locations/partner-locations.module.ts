@@ -20,5 +20,6 @@ import {ServiceabilityModule} from "../serviceability/serviceability.module";
   ],
   controllers: [PartnerLocationsController],
   providers: [PartnerLocationsService],
+  exports:[PartnerLocationsService]
 })
 export class PartnerLocationsModule {}

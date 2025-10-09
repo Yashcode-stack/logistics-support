@@ -1,16 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { CreateZoneMappingDto } from './dto/create-zone-mapping.dto';
 import { UpdateZoneMappingDto } from './dto/update-zone-mapping.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { ZoneMapping } from './entities/zone-mapping.entity';
+import { AnyKeys, FilterQuery, Model } from 'mongoose';
 
 @Injectable()
 export class ZoneMappingsService {
+
+  constructor(@InjectModel(ZoneMapping.name)
+   private readonly zoneMappingModel : Model<ZoneMapping>
+  ){}
   create(createZoneMappingDto: CreateZoneMappingDto) {
     return 'This action adds a new zoneMapping';
   }
-
-  findAll() {
-    return `This action returns all zoneMappings`;
+  async findAll(){
+     return 'This action needs to be added in zoneMapping';
   }
+   async findZone(
+     query: FilterQuery<ZoneMapping>,
+     projection: AnyKeys<ZoneMapping>
+   ) {
+     const result =  await this.zoneMappingModel
+       .find(query,projection)
+       return result
+   }
 
   findOne(id: number) {
     return `This action returns a #${id} zoneMapping`;
@@ -23,4 +37,5 @@ export class ZoneMappingsService {
   remove(id: number) {
     return `This action removes a #${id} zoneMapping`;
   }
+
 }

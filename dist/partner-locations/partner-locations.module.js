@@ -29,6 +29,7 @@ exports.PartnerLocationsModule = PartnerLocationsModule = __decorate([
         ],
         controllers: [partner_locations_controller_1.PartnerLocationsController],
         providers: [partner_locations_service_1.PartnerLocationsService],
+        exports: [partner_locations_service_1.PartnerLocationsService]
     })
 ], PartnerLocationsModule);
 //# sourceMappingURL=partner-locations.module.js.map

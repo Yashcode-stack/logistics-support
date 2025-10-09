@@ -5,7 +5,7 @@ export declare class ZoneMappingsController {
     private readonly zoneMappingsService;
     constructor(zoneMappingsService: ZoneMappingsService);
     create(createZoneMappingDto: CreateZoneMappingDto): string;
-    findAll(): string;
+    findAll(): Promise<string>;
     findOne(id: string): string;
     update(id: string, updateZoneMappingDto: UpdateZoneMappingDto): string;
     remove(id: string): string;

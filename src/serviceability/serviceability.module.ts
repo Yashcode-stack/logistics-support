@@ -7,6 +7,8 @@ import {
   ServiceabiltySchema,
 } from './entities/serviceability.entity';
 import { PartnerLocationsModule } from '../partner-locations/partner-locations.module';
+import { DeliveryPartnersModule } from 'src/delivery-partners/delivery-partners.module';
+import { ZoneMappingsModule } from 'src/zone-mappings/zone-mappings.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { PartnerLocationsModule } from '../partner-locations/partner-locations.m
       { name: Serviceability.name, schema: ServiceabiltySchema },
     ]),
     forwardRef(() => PartnerLocationsModule),
+    DeliveryPartnersModule,
+    ZoneMappingsModule
   ],
   controllers: [ServiceabilityController],
   providers: [ServiceabilityService],

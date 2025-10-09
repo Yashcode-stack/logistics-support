@@ -10,13 +10,20 @@ exports.DeliveryPartnersModule = void 0;
 const common_1 = require("@nestjs/common");
 const delivery_partners_service_1 = require("./delivery-partners.service");
 const delivery_partners_controller_1 = require("./delivery-partners.controller");
+const mongoose_1 = require("@nestjs/mongoose");
+const delivery_partner_entity_1 = require("./entities/delivery-partner.entity");
 let DeliveryPartnersModule = class DeliveryPartnersModule {
 };
 exports.DeliveryPartnersModule = DeliveryPartnersModule;
 exports.DeliveryPartnersModule = DeliveryPartnersModule = __decorate([
     (0, common_1.Module)({
+        imports: [mongoose_1.MongooseModule.forFeature([{
+                    name: delivery_partner_entity_1.DeliveryPartner.name,
+                    schema: delivery_partner_entity_1.DeliveryPartnerSchema
+                }])],
         controllers: [delivery_partners_controller_1.DeliveryPartnersController],
         providers: [delivery_partners_service_1.DeliveryPartnersService],
+        exports: [delivery_partners_service_1.DeliveryPartnersService]
     })
 ], DeliveryPartnersModule);
 //# sourceMappingURL=delivery-partners.module.js.map
