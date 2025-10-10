@@ -6,6 +6,7 @@ export declare class DeliveryPartnersService {
     private readonly deliveryPartnerModel;
     constructor(deliveryPartnerModel: Model<DeliveryPartner>);
     create(createDeliveryPartnerDto: CreateDeliveryPartnerDto): string;
+    getPartnerNames(uniqueIds: Set<string>): Promise<any[]>;
     findAll(): Promise<(import("mongoose").Document<unknown, {}, DeliveryPartner, {}, {}> & DeliveryPartner & {
         _id: import("mongoose").Types.ObjectId;
     } & {

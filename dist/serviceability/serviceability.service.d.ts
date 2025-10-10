@@ -16,7 +16,6 @@ export declare class ServiceabilityService {
             zone: string;
         } | null | undefined)[];
     }>;
-    private mapPartnerDetails;
     private calculateZoneForEachCarrier;
     private handleDelhivery;
     private handleXpressbees;

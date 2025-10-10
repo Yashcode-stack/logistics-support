@@ -32,8 +32,7 @@ let ServiceabilityService = class ServiceabilityService {
         if (uniquePartnerIds.size === 0) {
             throw new common_1.HttpException(`Service is not available for this pincode: ${origin}`, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        const allPartners = await this.deliveryPartnerService.findAll();
-        const partnerDetails = this.mapPartnerDetails(uniquePartnerIds, allPartners);
+        const partnerDetails = await this.deliveryPartnerService.getPartnerNames(uniquePartnerIds);
         const availablePartners = await this.calculateZoneForEachCarrier(originLocations, destinationLocations, partnerDetails);
         return {
             origin: origin,
@@ -41,21 +40,33 @@ let ServiceabilityService = class ServiceabilityService {
             availablePartners
         };
     }
-    mapPartnerDetails(uniqueIds, allPartners) {
-        const details = [];
-        for (const id of uniqueIds) {
-            const match = allPartners.find((p) => p._id.toString() === id);
-            if (match) {
-                details.push({
-                    deliveryPartnerId: id,
-                    name: match.name,
-                    status: match.status,
-                });
-            }
-        }
-        return details;
-    }
     async calculateZoneForEachCarrier(originData, destinationData, partners) {
+        const delhivery = [
+            { $match: { partnerName: "Delhivery", originCity: "Delhi NCR" } },
+            { $project: { _id: 0, zone: 1, originCity: 1, destinationCity: 1 } }
+        ];
+        this.zoneMappingService.aggregateCouriers([
+            {
+                $facet: {
+                    delhivery: [
+                        { $match: { partnerName: "Delhivery", originCity: "Delhi NCR" } },
+                        { $project: { _id: 0, zone: 1, originCity: 1, destinationCity: 1 } }
+                    ],
+                    xpressbees: [
+                        { $match: { partnerName: "Xpressbees", pincode: { $exists: true } } },
+                        { $project: { _id: 0, zone: 1, pincode: 1 } }
+                    ],
+                    ekart: [
+                        { $match: { partnerName: "Ekart", region: "North" } },
+                        { $project: { _id: 0, zone: 1, region: 1 } }
+                    ],
+                    shadowfox: [
+                        { $match: { partnerName: "Shadowfox", metro: "Yes" } },
+                        { $project: { _id: 0, zone: 1, originState: 1, destinationState: 1 } }
+                    ]
+                }
+            }
+        ]);
         const promises = partners.map(async (partner) => {
             const originForPartner = originData.filter((d) => d.deliveryPartnerId === partner.deliveryPartnerId);
             const destinationForPartner = destinationData.filter((d) => d.deliveryPartnerId === partner.deliveryPartnerId);
@@ -122,6 +133,7 @@ let ServiceabilityService = class ServiceabilityService {
         };
     }
     async handleShadowfox(origin, destination, status) {
+        console.log(origin, destination);
         const result = await this.zoneMappingService.findZone({
             deliveryPartnerId: new mongoose_1.Types.ObjectId(origin.deliveryPartnerId),
             originCity: new RegExp(`^${origin.cityName}$`, 'i'),
@@ -129,6 +141,7 @@ let ServiceabilityService = class ServiceabilityService {
             originState: new RegExp(`^${origin.state}$`, 'i'),
             destinationState: new RegExp(`^${destination.state}$`, 'i'),
         }, {});
+        console.log(result);
         if (result[0]) {
             return {
                 deliveryPartnerId: origin.deliveryPartnerId,
@@ -148,14 +161,15 @@ let ServiceabilityService = class ServiceabilityService {
     determineZone(originZone, destinationZone) {
         if (!originZone || !destinationZone)
             return 'NA';
-        if (originZone.originCity === destinationZone.originCity)
+        if (originZone.originCity.toLowerCase() === destinationZone.originCity.toLowerCase())
             return 'Zone A';
-        if (originZone.region === destinationZone.region)
+        if (originZone.region.toLowerCase() === destinationZone.region.toLowerCase())
             return 'Zone B';
-        if (originZone.metro === 'Yes' && destinationZone.metro === 'Yes')
+        if (originZone.metro.toLowerCase() === 'yes' && destinationZone.metro.toLowerCase() === 'yes')
             return 'Zone C';
-        if ((originZone.region === 'North East and Special states' ||
-            destinationZone.region === 'North East and Special states' || originZone.region == "North East and J&K" || destinationZone.region == "North East and J&K"))
+        const specialRegions = ['North East and Special states', 'North East and J&K'];
+        if ((specialRegions.includes(originZone.region) ||
+            specialRegions.includes(destinationZone.region)))
             return 'Zone E';
         return 'Zone D';
     }

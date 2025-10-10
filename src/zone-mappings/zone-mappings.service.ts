@@ -7,6 +7,9 @@ import { AnyKeys, FilterQuery, Model } from 'mongoose';
 
 @Injectable()
 export class ZoneMappingsService {
+  async aggregateCouriers(pipeline : any[]) {
+    return await this.zoneMappingModel.aggregate(pipeline);
+  }
 
   constructor(@InjectModel(ZoneMapping.name)
    private readonly zoneMappingModel : Model<ZoneMapping>
@@ -21,6 +24,7 @@ export class ZoneMappingsService {
      query: FilterQuery<ZoneMapping>,
      projection: AnyKeys<ZoneMapping>
    ) {
+    console.log(query)
      const result =  await this.zoneMappingModel
        .find(query,projection)
        return result

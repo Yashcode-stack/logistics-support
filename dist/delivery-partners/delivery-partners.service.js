@@ -25,6 +25,21 @@ let DeliveryPartnersService = class DeliveryPartnersService {
     create(createDeliveryPartnerDto) {
         return 'This action adds a new deliveryPartner';
     }
+    async getPartnerNames(uniqueIds) {
+        const allPartners = await this.deliveryPartnerModel.find();
+        const details = [];
+        for (const id of uniqueIds) {
+            const match = allPartners.find((p) => p._id.toString() === id);
+            if (match) {
+                details.push({
+                    deliveryPartnerId: id,
+                    name: match.name,
+                    status: match.status,
+                });
+            }
+        }
+        return details;
+    }
     async findAll() {
         return await this.deliveryPartnerModel.find();
     }

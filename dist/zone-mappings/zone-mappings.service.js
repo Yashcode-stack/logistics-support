@@ -19,6 +19,9 @@ const zone_mapping_entity_1 = require("./entities/zone-mapping.entity");
 const mongoose_2 = require("mongoose");
 let ZoneMappingsService = class ZoneMappingsService {
     zoneMappingModel;
+    aggregateCouriers(arg0) {
+        throw new Error('Method not implemented.');
+    }
     constructor(zoneMappingModel) {
         this.zoneMappingModel = zoneMappingModel;
     }
@@ -29,6 +32,7 @@ let ZoneMappingsService = class ZoneMappingsService {
         return 'This action needs to be added in zoneMapping';
     }
     async findZone(query, projection) {
+        console.log(query);
         const result = await this.zoneMappingModel
             .find(query, projection);
         return result;
