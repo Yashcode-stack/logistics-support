@@ -220,7 +220,6 @@ return results.filter(Boolean);
   }
 
   private async handleShadowfox(origin: any, destination: any,status:string) {
-    console.log(origin,destination)
 
     const result = await this.zoneMappingService.findZone(
       {
@@ -232,7 +231,6 @@ return results.filter(Boolean);
       },
       {},
     );
-    console.log(result)
     if(result[0]){
    return{
       deliveryPartnerId: origin.deliveryPartnerId,

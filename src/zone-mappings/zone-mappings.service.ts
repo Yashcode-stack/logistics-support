@@ -24,7 +24,6 @@ export class ZoneMappingsService {
      query: FilterQuery<ZoneMapping>,
      projection: AnyKeys<ZoneMapping>
    ) {
-    console.log(query)
      const result =  await this.zoneMappingModel
        .find(query,projection)
        return result
