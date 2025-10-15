@@ -9,6 +9,7 @@ import {
 import { PartnerLocationsModule } from '../partner-locations/partner-locations.module';
 import { DeliveryPartnersModule } from 'src/delivery-partners/delivery-partners.module';
 import { ZoneMappingsModule } from 'src/zone-mappings/zone-mappings.module';
+import { UploadModule } from 'src/upload/upload.module';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { ZoneMappingsModule } from 'src/zone-mappings/zone-mappings.module';
     ]),
     forwardRef(() => PartnerLocationsModule),
     DeliveryPartnersModule,
-    ZoneMappingsModule
+    ZoneMappingsModule,UploadModule
   ],
   controllers: [ServiceabilityController],
   providers: [ServiceabilityService],

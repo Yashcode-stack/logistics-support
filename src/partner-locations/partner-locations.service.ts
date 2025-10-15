@@ -41,12 +41,18 @@ export class PartnerLocationsService {
       .limit(limit);
   }
 
+  
+
   // GET one
   getOne(
     query: FilterQuery<PartnerLocation>,
     projection: AnyKeys<PartnerLocation>,
   ) {
     return this.partnerLocationModel.findOne(query, projection);
+  }
+
+  async aggregate(pipeline : any[]){
+    return await this.partnerLocationModel.aggregate(pipeline)
   }
 
 

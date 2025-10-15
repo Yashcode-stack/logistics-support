@@ -12,53 +12,224 @@ export class ServiceabilityService {
     private readonly zoneMappingService: ZoneMappingsService,
   ) {}
 
+  async batchCheckServiceability(odPairs: { origin: string; destination: string }[]) {
+  const BATCH_SIZE = 10;
+  const results:any = [];
+
+  console.log(odPairs)
+  for (let i = 0; i < odPairs.length; i += BATCH_SIZE) {
+    const batch = odPairs.slice(i, i + BATCH_SIZE);
+
+    const batchResults = await Promise.allSettled(
+      batch.map(async (pair) => {
+        try {
+          return await this.checkServiceability(pair);
+        } catch (err) {
+          return {
+            origin: pair.origin,
+            destination: pair.destination,
+            error: err.message || 'Unknown error',
+          };
+        }
+      })
+    );
+
+    results.push(...batchResults);
+  }
+
+  return results;
+}
+
 
 
 
   async checkServiceability(body: any) {
     const { origin, destination } = body;
+    // const originLocations = await this.partnerLocationService.getAll(
+    //   { pincode: origin },
+    //   {},
+    //   1,
+    //   100,
+    // );
 
-    const originLocations = await this.partnerLocationService.getAll(
-      { pincode: origin },
-      {},
-      1,
-      100,
+    // const destinationLocations = await this.partnerLocationService.getAll(
+    //   { pincode: destination },
+    //   {},
+    //   1,
+    //   100,
+    // );
+
+    // const uniquePartnerIds = new Set<string>(
+    //   originLocations.map((loc) => loc?.deliveryPartnerId),
+    // );
+
+    // if (uniquePartnerIds.size === 0) {
+    //   throw new HttpException(
+    //     `Service is not available for this pincode: ${origin}`,
+    //     HttpStatus.UNPROCESSABLE_ENTITY,
+    //   );
+    // }
+
+    // const partnerDetails = await this.deliveryPartnerService.getPartnerNames(uniquePartnerIds);
+
+
+      // const availablePartners = await this.calculateZoneForEachCarrier(
+    //   originLocations, 
+    //   destinationLocations,
+    //   partnerDetails,
+    // );
+
+
+    // return {
+    //   origin:origin,
+    //   destination:destination,
+    //   availablePartners
+    // };
+
+const pipline = [
+  {
+    $facet: {
+      originGrouped: [
+        { $match: { pincode: origin.toString() } },
+        {
+          $lookup: {
+            from: 'delivery_partners',
+            localField: 'deliveryPartnerId',
+            foreignField: '_id',
+            as: 'partner',
+          },
+        },
+        { $unwind: { path: '$partner', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: '$partner.name',
+            originLocations: {
+              $push: {
+                _id: '$_id',
+                pincode: '$pincode',
+                cityName: '$cityName',
+                state: '$state',
+                deliveryPartnerId: '$deliveryPartnerId',
+              },
+            },
+          },
+        },
+      ],
+      destinationGrouped: [
+        { $match: { pincode: destination.toString() } },
+        {
+          $lookup: {
+            from: 'delivery_partners',
+            localField: 'deliveryPartnerId',
+            foreignField: '_id',
+            as: 'partner',
+          },
+        },
+        { $unwind: { path: '$partner', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: '$partner.name',
+            destinationLocations: {
+              $push: {
+                _id: '$_id',
+                pincode: '$pincode',
+                cityName: '$cityName',
+                state: '$state',
+                deliveryPartnerId: '$deliveryPartnerId',
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+
+  {
+    $project: {
+      merged: {
+        $map: {
+          input: {
+            $setUnion: [
+              { $map: { input: '$originGrouped', as: 'o', in: '$$o._id' } },
+              { $map: { input: '$destinationGrouped', as: 'd', in: '$$d._id' } },
+            ],
+          },
+          as: 'partnerName',
+          in: {
+            partnerName: '$$partnerName',
+            originLocations: {
+              $let: {
+                vars: {
+                  origin: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: '$originGrouped',
+                          cond: { $eq: ['$$this._id', '$$partnerName'] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+                in: { $ifNull: ['$$origin.originLocations', []] },
+              },
+            },
+            destinationLocations: {
+              $let: {
+                vars: {
+                  dest: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: '$destinationGrouped',
+                          cond: { $eq: ['$$this._id', '$$partnerName'] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+                in: { $ifNull: ['$$dest.destinationLocations', []] },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  {
+    $replaceRoot: {
+      newRoot: {
+        $arrayToObject: {
+          $map: {
+            input: '$merged',
+            as: 'm',
+            in: { k: '$$m.partnerName', v: { originLocations: '$$m.originLocations', destinationLocations: '$$m.destinationLocations' } },
+          },
+        },
+      },
+    },
+  },
+]
+
+
+  const partnerDetails = await this.partnerLocationService.aggregate(pipline)
+
+  
+// return partnerDetails
+
+    const availablePartners = await this.buildZoneAggregationPipeline(
+ 
+      partnerDetails[0],
     );
-
-    const destinationLocations = await this.partnerLocationService.getAll(
-      { pincode: destination },
-      {},
-      1,
-      100,
-    );
-
-    const uniquePartnerIds = new Set<string>(
-      originLocations.map((loc) => loc?.deliveryPartnerId),
-    );
-
-    if (uniquePartnerIds.size === 0) {
-      throw new HttpException(
-        `Service is not available for this pincode: ${origin}`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+    
+    return {
+      origin,destination,
+      availablePartners
     }
 
-    const partnerDetails = await this.deliveryPartnerService.getPartnerNames(uniquePartnerIds);
-
-    const availablePartners = await this.calculateZoneForEachCarrier(
-      originLocations, 
-      destinationLocations,
-      partnerDetails,
-    );
-
-
-    
-
-    return {
-      origin:origin,
-      destination:destination,
-      availablePartners
-    };
   }
 
 
@@ -71,39 +242,7 @@ private async calculateZoneForEachCarrier(
 ) {
 
 
-  // --------------------------------------------
-
-        //   deliveryPartnerId: new Types.ObjectId(origin.deliveryPartnerId),
-        // originCity: new RegExp(`^${origin.cityName}$`, 'i'),
-        // destinationCity: new RegExp(`^${destination.cityName}$`, 'i'),
-
-
-//   const delhivery = [
-//         { $match: { partnerName: "Delhivery", originCity: "Delhi NCR" } },
-//         { $project: { _id: 0, zone: 1, originCity: 1, destinationCity: 1 } }
-//       ]
-//   this.zoneMappingService.aggregateCouriers([
-//   {
-//     $facet: {
-//       delhivery: [
-//         { $match: { partnerName: "Delhivery", originCity: "Delhi NCR" } },
-//         { $project: { _id: 0, zone: 1, originCity: 1, destinationCity: 1 } }
-//       ],
-//       xpressbees: [
-//         { $match: { partnerName: "Xpressbees", pincode: { $exists: true } } },
-//         { $project: { _id: 0, zone: 1, pincode: 1 } }
-//       ],
-//       ekart: [
-//         { $match: { partnerName: "Ekart", region: "North" } },
-//         { $project: { _id: 0, zone: 1, region: 1 } }
-//       ],
-//       shadowfox: [
-//         { $match: { partnerName: "Shadowfox", metro: "Yes" } },
-//         { $project: { _id: 0, zone: 1, originState: 1, destinationState: 1 } }
-//       ]
-//     }
-//   }
-// ]);
+ 
 
 
 
@@ -257,6 +396,159 @@ return results.filter(Boolean);
     )[0];
   }
 
+
+// ------------------------------------------------------Optimizing Query
+async  buildZoneAggregationPipeline(
+
+  partnerDetails,
+) {
+  const pipelines:any = {};
+  const pipelines2:any = {};
+    const time = Date.now()
+
+ pipelines.delhivery = [
+  {
+    $match: {
+      deliveryPartnerId: new Types.ObjectId(partnerDetails.Delhivery.originLocations[0].deliveryPartnerId),
+      originCity: new RegExp(`^${partnerDetails.Delhivery.originLocations[0].cityName}$`, 'i'),
+      destinationCity: new RegExp(`^${partnerDetails.Delhivery.destinationLocations[0].cityName}$`, 'i'),
+    }
+  },
+  {
+    $limit: 1,
+  },
+  {
+    $project: {
+      _id: 0,
+      zone: 1,
+    }
+  }
+];
+  
+
+pipelines.shadowfox = [
+  {
+    $match: {
+      deliveryPartnerId: new Types.ObjectId(partnerDetails.Shadowfox.originLocations[0].deliveryPartnerId),
+      originCity: new RegExp(`^${partnerDetails.Shadowfox.originLocations[0].cityName}$`, 'i'),
+      destinationCity: new RegExp(`^${partnerDetails.Shadowfox.destinationLocations[0].cityName}$`, 'i'),
+      originState: new RegExp(`^${partnerDetails.Shadowfox.originLocations[0].state}$`, 'i'),
+      destinationState: new RegExp(`^${partnerDetails.Shadowfox.destinationLocations[0].state}$`, 'i'),
+    },
+  },
+  
+  {
+    $limit: 1, 
+  },
+  {
+    $project: {
+      _id: 0,
+      zone: 1,
+    },
+  },
+];
+ 
+
+  if (Object.keys(pipelines).length === 0) {
+    return null;
+  }
+
+
+console.log(JSON.stringify(partnerDetails.Delhivery.originLocations[0].cityName))
+  const DelhiveryAndShadowfox = await this.zoneMappingService.aggregateCouriers([
+//     {
+//   $match: 
+//       {
+//         originCity: {
+//           $in: [
+//             partnerDetails.Delhivery.originLocations[0].cityName.toUpperCase(),
+//             partnerDetails.Shadowfox.originLocations[0].cityName.toUpperCase()
+//           ]
+//         }
+//       }
+// },
+{
+  $match: {
+    $or: [
+      {
+        originCity: partnerDetails.Delhivery.originLocations[0].cityName.toUpperCase(),
+        destinationCity: partnerDetails.Delhivery.destinationLocations[0].cityName.toUpperCase()
+      },
+      {
+        originCity: partnerDetails.Shadowfox.originLocations[0].cityName.toUpperCase(),
+        destinationCity: partnerDetails.Shadowfox.destinationLocations[0].cityName.toUpperCase()
+      }
+    ]
+  }
+},
+    {
+      $facet: pipelines,
+    },
+  ]);
+
+//  const [originZone, destinationZone] = await Promise.all([
+//       this.findZoneByPincode(origin),
+//       this.findZoneByPincode(destination),
+//     ]);
+
+//     const zone = this.determineZone(originZone, destinationZone);
+
+//     return {
+//       deliveryPartnerId: origin.deliveryPartnerId,
+//       name : "Ekart",
+//       status : status,
+//       zone: zone
+//     };
+
+
+  const aggregatedData = await this.zoneMappingService.aggregateCouriers([
+    {
+  $match: {
+        pincode: {
+          $in: [
+            parseInt(partnerDetails.Ekart.originLocations[0].pincode),
+            parseInt(partnerDetails.Ekart.destinationLocations[0].pincode),
+            parseInt(partnerDetails.Xpressbees.originLocations[0].pincode),
+            parseInt(partnerDetails.Xpressbees.destinationLocations[0].pincode),
+          ]
+        }
+      }
+}
+  ]);
+
+const deliveryPartnersWithPincode = ['Ekart', 'Xpressbees' ]
+for (const partner of deliveryPartnersWithPincode) {
+  const partnerInfo = partnerDetails[partner];
+
+  const originLocation = partnerInfo.originLocations[0];
+  const destinationLocation = partnerInfo.destinationLocations[0];
+ 
+  const originZone = aggregatedData.find((zone) =>zone.pincodeId.toString() === originLocation._id.toString()  &&
+    zone.deliveryPartnerId.toString() === originLocation.deliveryPartnerId.toString()  &&
+    zone.originCity.toLowerCase() === originLocation.cityName.toLowerCase());
+
+  // Match destination zone
+  const destinationZone = aggregatedData.find((zone) =>
+    zone.pincodeId.toString() === destinationLocation._id.toString()  &&
+    zone.deliveryPartnerId.toString() === destinationLocation.deliveryPartnerId.toString()  &&
+    zone.originCity.toLowerCase() === destinationLocation.cityName.toLowerCase()
+  );
+
+  const zone = this.determineZone(originZone, destinationZone);
+
+  DelhiveryAndShadowfox.push({
+     [partner] :[{
+      zone
+     }]
+  });
+}
+
+  console.log(time - Date.now())
+
+return DelhiveryAndShadowfox
+ 
+}
+
   private determineZone(originZone: any, destinationZone: any): string {
 
 
@@ -274,4 +566,6 @@ return results.filter(Boolean);
 
     return 'Zone D';
   }
+
+
 }

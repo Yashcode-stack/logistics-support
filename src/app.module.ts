@@ -10,6 +10,7 @@ import { OdPairsModule } from './od-pairs/od-pairs.module';
 import { PartnerLocationsModule } from './partner-locations/partner-locations.module';
 import { PerformanceMetricsModule } from './performance-metrics/performance-metrics.module';
 import { ZoneMappingsModule } from './zone-mappings/zone-mappings.module';
+import { UploadModule } from './upload/upload.module';
 @Module({
   imports: [
     MongooseModule.forRoot(CONFIG_VARIABLE.db.mongodburl),
@@ -19,6 +20,7 @@ import { ZoneMappingsModule } from './zone-mappings/zone-mappings.module';
     PartnerLocationsModule,
     PerformanceMetricsModule,
     ZoneMappingsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
