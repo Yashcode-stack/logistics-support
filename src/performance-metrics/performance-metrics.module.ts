@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { PerformanceMetricsService } from './performance-metrics.service';
-import { PerformanceMetricsController } from './performance-metrics.controller';
+import { Module } from "@nestjs/common";
+import { PerformanceMetricsService } from "./performance-metrics.service";
+import { PerformanceMetricsController } from "./performance-metrics.controller";
 
 @Module({
   controllers: [PerformanceMetricsController],

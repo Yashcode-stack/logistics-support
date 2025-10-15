@@ -1,4 +1,4 @@
-import { config } from 'dotenv';
+import { config } from "dotenv";
 config();
 
 const getVariable = (variableName: string) => {
@@ -11,9 +11,9 @@ const getVariable = (variableName: string) => {
 
 export const CONFIG_VARIABLE = {
   environment: {
-    currEnv: getVariable('SERVER_ENVIRONMENT'),
+    currEnv: getVariable("SERVER_ENVIRONMENT"),
   },
   db: {
-    mongodburl: getVariable('MONGODB_URL'),
+    mongodburl: getVariable("MONGODB_URL"),
   },
 };

@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PerformanceMetricsController } from './performance-metrics.controller';
-import { PerformanceMetricsService } from './performance-metrics.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PerformanceMetricsController } from "./performance-metrics.controller";
+import { PerformanceMetricsService } from "./performance-metrics.service";
 
-describe('PerformanceMetricsController', () => {
+describe("PerformanceMetricsController", () => {
   let controller: PerformanceMetricsController;
 
   beforeEach(async () => {
@@ -11,10 +11,12 @@ describe('PerformanceMetricsController', () => {
       providers: [PerformanceMetricsService],
     }).compile();
 
-    controller = module.get<PerformanceMetricsController>(PerformanceMetricsController);
+    controller = module.get<PerformanceMetricsController>(
+      PerformanceMetricsController,
+    );
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

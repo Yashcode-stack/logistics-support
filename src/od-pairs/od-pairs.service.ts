@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOdPairDto } from './dto/create-od-pair.dto';
-import { UpdateOdPairDto } from './dto/update-od-pair.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateOdPairDto } from "./dto/create-od-pair.dto";
+import { UpdateOdPairDto } from "./dto/update-od-pair.dto";
 
 @Injectable()
 export class OdPairsService {
   create(createOdPairDto: CreateOdPairDto) {
-    return 'This action adds a new odPair';
+    return "This action adds a new odPair";
   }
 
   findAll() {

@@ -1,9 +1,9 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type ServiceabilityDocument = HydratedDocument<Serviceability>;
 
-@Schema({ timestamps: true, collection: 'serviceability' })
+@Schema({ timestamps: true, collection: "serviceability" })
 export class Serviceability {
   @Prop()
   deliveryPartnerId: string;
@@ -17,7 +17,7 @@ export class Serviceability {
   @Prop()
   reversePickup: boolean;
 
-  @Prop() 
+  @Prop()
   pickup: boolean;
 }
 

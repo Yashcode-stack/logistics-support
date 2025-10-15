@@ -1,12 +1,12 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { PartnerLocationsService } from './partner-locations.service';
-import { PartnerLocationsController } from './partner-locations.controller';
-import { MongooseModule } from '@nestjs/mongoose';
+import { forwardRef, Module } from "@nestjs/common";
+import { PartnerLocationsService } from "./partner-locations.service";
+import { PartnerLocationsController } from "./partner-locations.controller";
+import { MongooseModule } from "@nestjs/mongoose";
 import {
   PartnerLocation,
   PartnerLocationSchema,
-} from './entities/partner-location.entity';
-import {ServiceabilityModule} from "../serviceability/serviceability.module";
+} from "./entities/partner-location.entity";
+import { ServiceabilityModule } from "../serviceability/serviceability.module";
 
 @Module({
   imports: [
@@ -20,6 +20,6 @@ import {ServiceabilityModule} from "../serviceability/serviceability.module";
   ],
   controllers: [PartnerLocationsController],
   providers: [PartnerLocationsService],
-  exports:[PartnerLocationsService]
+  exports: [PartnerLocationsService],
 })
 export class PartnerLocationsModule {}

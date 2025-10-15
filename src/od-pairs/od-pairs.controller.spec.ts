@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OdPairsController } from './od-pairs.controller';
-import { OdPairsService } from './od-pairs.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { OdPairsController } from "./od-pairs.controller";
+import { OdPairsService } from "./od-pairs.service";
 
-describe('OdPairsController', () => {
+describe("OdPairsController", () => {
   let controller: OdPairsController;
 
   beforeEach(async () => {
@@ -14,7 +14,7 @@ describe('OdPairsController', () => {
     controller = module.get<OdPairsController>(OdPairsController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

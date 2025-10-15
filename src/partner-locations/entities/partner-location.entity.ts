@@ -1,8 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument } from "mongoose";
 
 export type PartnerLocationDocument = HydratedDocument<PartnerLocation>;
-@Schema({timestamps:true,collection:"partner_locations"})
+@Schema({ timestamps: true, collection: "partner_locations" })
 export class PartnerLocation {
   @Prop()
   deliveryPartnerId: string;

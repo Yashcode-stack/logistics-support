@@ -1,4 +1,4 @@
-export interface ServiceabilityCheckType{
+export interface ServiceabilityCheckType {
   originPincodes: string[];
   destinationPincodes: string[];
-};
+}

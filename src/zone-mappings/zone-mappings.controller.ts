@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ZoneMappingsService } from './zone-mappings.service';
-import { CreateZoneMappingDto } from './dto/create-zone-mapping.dto';
-import { UpdateZoneMappingDto } from './dto/update-zone-mapping.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
+import { ZoneMappingsService } from "./zone-mappings.service";
+import { CreateZoneMappingDto } from "./dto/create-zone-mapping.dto";
+import { UpdateZoneMappingDto } from "./dto/update-zone-mapping.dto";
 
-@Controller('zone-mappings')
+@Controller("zone-mappings")
 export class ZoneMappingsController {
   constructor(private readonly zoneMappingsService: ZoneMappingsService) {}
 
@@ -17,18 +25,21 @@ export class ZoneMappingsController {
     return this.zoneMappingsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.zoneMappingsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateZoneMappingDto: UpdateZoneMappingDto) {
+  @Patch(":id")
+  update(
+    @Param("id") id: string,
+    @Body() updateZoneMappingDto: UpdateZoneMappingDto,
+  ) {
     return this.zoneMappingsService.update(+id, updateZoneMappingDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.zoneMappingsService.remove(+id);
   }
 }

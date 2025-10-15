@@ -3,38 +3,37 @@ import { HydratedDocument, Types } from "mongoose";
 
 export type ZoneMappingDocument = HydratedDocument<ZoneMapping>;
 
-
-@Schema({timestamps:true , collection : "zone_mappings"})
+@Schema({ timestamps: true, collection: "zone_mappings" })
 export class ZoneMapping {
-    @Prop({ type: Types.ObjectId})
-    deliveryPartnerId: string;
-    
-    @Prop()
-    originCity: string;
+  @Prop({ type: Types.ObjectId })
+  deliveryPartnerId: string;
 
-    @Prop()
-    originState: string;
+  @Prop()
+  originCity: string;
 
-    @Prop()
-    destinationCity: string;
+  @Prop()
+  originState: string;
 
-    @Prop()
-    destinationState: string;
+  @Prop()
+  destinationCity: string;
 
-    @Prop()
-    hubState: string;
+  @Prop()
+  destinationState: string;
 
-    @Prop({ type: Types.ObjectId})
-    pincode: string;
+  @Prop()
+  hubState: string;
 
-    @Prop()
-    region: string;
+  @Prop({ type: Types.ObjectId })
+  pincode: string;
 
-    @Prop()
-    metro: string;
+  @Prop()
+  region: string;
 
-    @Prop()
-    zone: string;
+  @Prop()
+  metro: string;
+
+  @Prop()
+  zone: string;
 }
 
 export const ZoneMappingSchema = SchemaFactory.createForClass(ZoneMapping);
