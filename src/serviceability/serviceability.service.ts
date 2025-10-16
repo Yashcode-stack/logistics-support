@@ -48,7 +48,7 @@ export class ServiceabilityService {
       {
         $facet: {
           originGrouped: [
-            { $match: { pincode: origin.toString() } },
+            { $match: { pincode: Number(origin) } },
             {
               $lookup: {
                 from: "delivery_partners",
@@ -74,7 +74,7 @@ export class ServiceabilityService {
             },
           ],
           destinationGrouped: [
-            { $match: { pincode: destination.toString() } },
+            { $match: { pincode: Number(destination)} },
             {
               $lookup: {
                 from: "delivery_partners",
@@ -291,7 +291,6 @@ export class ServiceabilityService {
         },
       ]);
 
-// const time = Date.now()
 
         const aggregatedData = await this.zoneMappingService.aggregateCouriers([
       {
@@ -308,7 +307,6 @@ export class ServiceabilityService {
         },
       },
     ]);
-// console.log(Date.now()- time)
 
     const deliveryPartnersWithPincode = ["Ekart", "Xpressbees"];
 
