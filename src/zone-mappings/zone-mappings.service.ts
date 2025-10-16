@@ -8,7 +8,6 @@ import { AnyKeys, FilterQuery, Model } from "mongoose";
 @Injectable()
 export class ZoneMappingsService {
   async aggregateCouriers(pipeline: any[]) {
-    console.log(JSON.stringify(pipeline));
     return await this.zoneMappingModel.aggregate(pipeline);
   }
 

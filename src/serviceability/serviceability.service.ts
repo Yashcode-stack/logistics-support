@@ -15,10 +15,9 @@ export class ServiceabilityService {
   async batchCheckServiceability(
     odPairs: { origin: string; destination: string }[],
   ) {
-    const BATCH_SIZE = 10;
+    const BATCH_SIZE = Number(process.env.BATCH_SIZE) || 20;
     const results: any = [];
 
-    console.log(odPairs);
     for (let i = 0; i < odPairs.length; i += BATCH_SIZE) {
       const batch = odPairs.slice(i, i + BATCH_SIZE);
 
@@ -186,11 +185,9 @@ export class ServiceabilityService {
     ];
 
     const partnerDetails = await this.partnerLocationService.aggregate(pipline);
-
     const availablePartners = await this.buildZoneAggregationPipeline(
       partnerDetails[0],
     );
-
     return {
       origin,
       destination,
@@ -294,24 +291,27 @@ export class ServiceabilityService {
         },
       ]);
 
-    const aggregatedData = await this.zoneMappingService.aggregateCouriers([
+// const time = Date.now()
+
+        const aggregatedData = await this.zoneMappingService.aggregateCouriers([
       {
         $match: {
           pincode: {
             $in: [
-              parseInt(partnerDetails.Ekart.originLocations[0].pincode),
-              parseInt(partnerDetails.Ekart.destinationLocations[0].pincode),
-              parseInt(partnerDetails.Xpressbees.originLocations[0].pincode),
-              parseInt(
-                partnerDetails.Xpressbees.destinationLocations[0].pincode,
-              ),
+              partnerDetails.Ekart.originLocations[0]._id,
+              partnerDetails.Ekart.destinationLocations[0]._id,
+              partnerDetails.Xpressbees.originLocations[0]._id,
+              partnerDetails.Xpressbees.destinationLocations[0]._id,
+              
             ],
           },
         },
       },
     ]);
+// console.log(Date.now()- time)
 
     const deliveryPartnersWithPincode = ["Ekart", "Xpressbees"];
+
     for (const partner of deliveryPartnersWithPincode) {
       const partnerInfo = partnerDetails[partner];
 
@@ -320,7 +320,7 @@ export class ServiceabilityService {
 
       const originZone = aggregatedData.find(
         (zone) =>
-          zone.pincodeId.toString() === originLocation._id.toString() &&
+          zone.pincode.toString() === originLocation._id.toString() &&
           zone.deliveryPartnerId.toString() ===
             originLocation.deliveryPartnerId.toString() &&
           zone.originCity.toLowerCase() ===
@@ -329,7 +329,7 @@ export class ServiceabilityService {
 
       const destinationZone = aggregatedData.find(
         (zone) =>
-          zone.pincodeId.toString() === destinationLocation._id.toString() &&
+          zone.pincode.toString() === destinationLocation._id.toString() &&
           zone.deliveryPartnerId.toString() ===
             destinationLocation.deliveryPartnerId.toString() &&
           zone.originCity.toLowerCase() ===
@@ -338,14 +338,9 @@ export class ServiceabilityService {
 
       const zone = this.determineZone(originZone, destinationZone);
 
-      DelhiveryAndShadowfox.push({
-        [partner]: [
-          {
-            zone,
-          },
-        ],
-      });
-    }
+      DelhiveryAndShadowfox[0][partner] = [{ zone }];
+
+      }
 
     return DelhiveryAndShadowfox;
   }
